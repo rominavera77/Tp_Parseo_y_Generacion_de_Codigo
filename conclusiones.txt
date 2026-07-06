@@ -1,0 +1,72 @@
+1. Definición y Descripción del Lenguaje de Programación
+
+El lenguaje diseñado, denominado LabLang, es un lenguaje específico de dominio (DSL)
+concebido para modelar, registrar y evaluar flujos lógicos de experimentos de laboratorio cuantitativos.
+Su enfoque principal radica en la captura sistemática de variables numéricas y de control 
+bajo condiciones específicas estructuradas.
+
+Componentes de la Sintaxis:
+
+    # Estructura Global (Experiment): Todo programa debe estar encapsulado dentro del bloque principal
+    denotado por la palabra reservada Experiment , seguida de un literal de tipo cadena de caracteres
+    ( STRING ) que le asigna un identificador identificativo al bloque.
+    # Instrucción de Almacenamiento (Record): Es la primitiva clave encargada de poblar la tabla de
+    símbolos. Asocia un identificador único con un valor tipado (entero, flotante o cadena) mediante el
+    operador de asignación simple ( = ).
+    # Estructuras de Control Lógico (If): Permite la bifurcación condicional de la ejecución basándose en la
+    resolución semántica de expresiones relacionales (comparaciones matemáticas).
+
+2. Implementación del Scanner (Analizador Léxico)
+
+El analizador léxico ha sido desarrollado utilizando el módulo de procesamiento nativo ply.lex . Su objetivo
+fundamental consiste en transformar el flujo continuo de caracteres del código fuente en una secuencia de
+componentes léxicos ordenados o tokens.
+La arquitectura del componente distingue de forma estricta entre palabras reservadas esenciales del
+lenguaje y literales asignados mediante expresiones regulares
+
+3. Implementación del Parser (Analizador Sintáctico)
+El procesamiento sintáctico emplea el algoritmo de parsing LALR provisto por el componente ply.yacc . El
+parser evalúa que la distribución secuencial de los tokens cumpla rigurosamente con la Gramática Libre de
+Contexto
+
+    experiment : EXPERIMENT STRING LBRACE steps RBRACE
+    steps : step | steps step
+    step : RECORD ID EQUALS expression SEMI
+         | IF LPAREN condition RPAREN LBRACE steps RBRACE
+
+4. Implementación de Acciones Semánticas
+Las acciones semánticas embebidas en las producciones gramaticales no se limitan únicamente a validar la
+sintaxis, sino que computan y ejecutan transformaciones estructurales directas sobre el entorno de 
+ejecución:
+
+Construcción Dinámica de la Tabla de Símbolos: Al procesar la estructura de la regla de producción
+p_step_record , el compilador extrae el lexema asociado al identificador ( t[2] ) y lo almacena de
+experiment : EXPERIMENT STRING LBRACE steps RBRACE
+steps : step | steps step
+step : RECORD ID EQUALS expression SEMI
+ | IF LPAREN condition RPAREN LBRACE steps RBRACE
+
+5.Casos de Prueba Automatizados
+Para asegurar la resiliencia del pipeline completo, se estructuró un banco de pruebas automatizado
+secuencial mediante la función ejecutar_test , aislando los entornos para garantizar la idempotencia de
+cada análisis:
+Test 1 (Control Léxico): Inyección de caracteres ilegales externos al alfabeto (como @ ). Comprueba la
+correcta captura del error y omisión segura del lexema inválido.
+Test 2 (Control Sintáctico): Simulación de truncamiento de datos mediante asignación vacía ( Record
+contador = ; ). El sistema aborta de forma segura el análisis emitiendo el mensaje de error de línea
+mediante p_error .
+Test 3 (Análisis Semántico y Persistencia): Ejecución de un programa completo con asignaciones
+mixtas e instrucciones condicionales válidas. Valida el correcto poblamiento del entorno y activa la
+escritura automática en el archivo físico de salida.
+
+Conclusiones
+
+Eficiencia en la Captura de Datos: La abstracción de un entorno estructurado como la Tabla de
+Símbolos sobre un diccionario nativo en Python proporciona tiempos de acceso constantes O(1). 
+Esto optimiza el rendimiento del compilador al momento de registrar y actualizar los estados de 
+los records.
+
+Robustez en el Manejo de Errores: La clara separación de responsabilidades entre las fases léxica,
+sintáctica y semántica garantiza que el compilador sea tolerante a fallos. El aislamiento implementado
+previene la propagación en cascada de errores no controlados, salvaguardando la integridad del
+sistema operativo del compilador.

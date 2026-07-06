@@ -1,0 +1,11 @@
+GRAMATICA
+
+Rule 0     S' -> experiment
+Rule 1     experiment -> EXPERIMENT STRING LBRACE steps RBRACE
+Rule 2     steps -> step
+Rule 3     steps -> steps step
+Rule 4     step -> MEASURE STRING AT INT SECONDS SEMI
+Rule 5     step -> RECORD STRING EQUALS value SEMI
+Rule 6     step -> ANALYZE STRING WITH STRING SEMI
+Rule 7     value -> INT
+Rule 8     value -> FLOAT

@@ -1,0 +1,9 @@
+Consulta sobre datos científicos
+
+Alcance:
+
+    # Definir un experimento con nombre.
+    # Medir variables en momentos específicos.
+    # Registrar valores numéricos.
+    # Analizar datos con métodos predefinidos (ej. promedio, desviación estándar).
+
